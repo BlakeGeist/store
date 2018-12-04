@@ -9,17 +9,17 @@
       <div class="product-details">
         <h1>
           <div v-if="this.$route.query.editPage">
-            <textarea-autosize ref="textarea2" v-model="product.item_name" type="text" />
+            <textarea @input="updateTextArea" ref="textarea2" v-model="product.item_name" type="text" />
           </div>
           <div v-else>{{product.item_name}}</div>
         </h1>
         <div class="product-description">
-          <div v-if="this.$route.query.editPage">
-            <textarea-autosize ref="textarea" v-model="product.description" type="text" />
+          <div class="product-description-text" v-if="this.$route.query.editPage">
+            <textarea @input="updateTextArea" ref="textarea" v-model="product.description" type="text" />
           </div>
-          <div v-else v-html="product.description"></div>
+          <div class="product-description-text" v-else v-html="product.description"></div>
         </div>
-        <div class="product-brand"><strong>Brand - </strong> {{product.brand_name}}</div>
+        <p class="product-brand"><strong>Brand - </strong> {{product.brand_name}}</p>
         <hr />
         <div class="product-price">
           <div v-if="this.$route.query.editPage">
@@ -28,7 +28,7 @@
           </div>
           <div v-else class="product-msrp">
             <strong>Original Price - </strong>
-            <span class="strike">${{msrp}}</span>
+            <span class="strike">${{product.msrp}}</span>
           </div>
           <div v-if="this.$route.query.editPage">
             <strong>Sale Price - </strong>
@@ -36,7 +36,7 @@
           </div>
           <div v-else class="product-sale-price">
             <strong>Sale Price - </strong>
-            <span class="">${{amount}}</span>
+            <span class="">${{product.price}}</span>
           </div>
           <div class="product-price">
             Quantity x
@@ -66,18 +66,18 @@
     </div>
     <div v-if="this.$route.query.editPage" class="update-product"><button @click="updateProduct(product)">Update</button></div>
     <vue-stripe-checkout
-          ref="checkoutRef"
-          :image="image"
-          :name="name"
-          :description="description"
-          :currency="currency"
-          :amount="parseInt(amount)"
-          :allow-remember-me="false"
-          @done="done"
-          @opened="opened"
-          @closed="closed"
-        >
-      </vue-stripe-checkout>
+        ref="checkoutRef"
+        :image="image"
+        :name="name"
+        :description="description"
+        :currency="currency"
+        :amount="parseInt(amount)"
+        :allow-remember-me="false"
+        @done="done"
+        @opened="opened"
+        @closed="closed"
+      >
+    </vue-stripe-checkout>
     <div class="footer">
       <router-link to="/privacy-policy" target="_blank">Privacy</router-link> |
       <router-link to="/terms" target="_blank">Terms</router-link>
@@ -141,7 +141,7 @@ export default {
   }, **/
   methods: {
     async checkout () {
-      //  const token = await this.$refs.checkoutRef.open()
+      const token = await this.$refs.checkoutRef.open()
     },
     done (token) {
       // do stuff
@@ -153,6 +153,7 @@ export default {
       // do stuff
     },
     updateProduct: function (product) {
+      console.log(product)
       db.collection('products').doc(product.item_id).set(product)
         .then(function () {
           console.log('Document successfully written!')
@@ -162,29 +163,38 @@ export default {
         })
     },
     updateQuantity () {
-      this.msrp = (this.quantity * this.product.msrp)
-      this.msrp = Math.round(100 * this.msrp) / 100
-      this.amount = this.quantity * this.product.price
-      this.amount = Math.round(100 * this.amount) / 100
+      this.product.msrp = (this.quantity * this.product.orgMsrp)
+      this.product.msrp = Math.round(100 * this.product.msrp) / 100
+      this.product.price = this.quantity * this.product.orgPrice
+      this.product.price = Math.round(100 * this.product.price) / 100
+    },
+    updateTextArea () {
+      this.$refs.textarea.style.minHeight = this.$refs.textarea.scrollHeight + 'px'
+      this.$refs.textarea2.style.minHeight = this.$refs.textarea2.scrollHeight + 'px'
     }
   },
   async asyncData({app, params, error}) {
     const ref = db.collection("products").doc(params.id)
     let snap
+    let thisProduct = {}
     try {
       snap = await ref.get()
+      thisProduct = snap.data()
+      thisProduct.orgMsrp =  thisProduct.msrp
+      thisProduct.orgPrice =  thisProduct.price
     } catch (e) {
       // TODO: error handling
       console.error(e)
     }
     return {
-      product: snap.data()
+      product: thisProduct
     }
   },
-  mounted() {
-    console.log(this);
-    console.log(this.$store);
-    console.log(this.state);
+  mounted () {
+    if(this.$refs.textarea) {
+      this.$refs.textarea.style.minHeight = this.$refs.textarea.scrollHeight + 'px'
+      this.$refs.textarea2.style.minHeight = this.$refs.textarea2.scrollHeight + 'px'
+    }
   }
 }
 </script>
@@ -192,17 +202,27 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="less">
 body {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
   margin: 0
 }
-html, body, #__nuxt, .product{
+p{
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+html, body, #__nuxt, #__layout, .default,  .product{
   height: 100%;
 }
 .product {
+  justify-content: center;
   display: flex;
   max-width: 1150px;
   margin: 0 auto;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: center;
+  padding: 0 24px;
   &-price{
     input {
       border: 1px solid;
@@ -227,17 +247,32 @@ html, body, #__nuxt, .product{
     }
     h1{
       font-size: 1.9rem;
+      margin: 15px 0 20px;
     }
     hr{
       width: 50%;
       margin: .5rem 0px;
     }
+    p{
+
+    }
+  }
+  .product-description-text{
+    margin: 10px 0;
   }
   .product-image, .product-details-wrapper{
-    flex: 0 1 50%;
     align-items: center;
     display: flex;
     justify-content: center;
+  }
+  .product-details-wrapper{
+    flex: 0 1 535px;
+  }
+  .product-image{
+    flex: 0 1 535px;
+    img{
+      width: 100%;
+    }
   }
   .product-price{
     .strike{
@@ -265,6 +300,7 @@ html, body, #__nuxt, .product{
     flex: 1 1 100%;
     text-align: center;
     color: #ccc;
+    margin-top: 25px;
     padding: 15px;
     a {
       color: #ccc;

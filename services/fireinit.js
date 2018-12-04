@@ -12,6 +12,9 @@ if (!firebase.apps.length) {
     storageBucket: 'web-store-7945b.appspot.com',
     messagingSenderId: '994328374920'
   })
+  const firestore = firebase.firestore();
+  const settings = {timestampsInSnapshots: true};
+  firestore.settings(settings);
 }
 
 export const auth = firebase.auth()
