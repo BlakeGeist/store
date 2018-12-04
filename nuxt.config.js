@@ -1,4 +1,5 @@
 const pkg = require('./package')
+const { STRIPE_TOKEN } = process.env;
 
 module.exports = {
   buildDir: './functions/nuxt',
@@ -34,9 +35,8 @@ module.exports = {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    '~/plugins/fireauth',
-    '~/plugins/textArea',
-    { src: '~/plugins/stripe', ssr: false }
+    { src: '~/plugins/stripe', ssr: false },
+    { src: '~/plugins/fireauth', ssr: true }
   ],
 
   /*
@@ -44,8 +44,13 @@ module.exports = {
   */
   modules: [
     // Doc: https://github.com/nuxt-community/axios-module#usage
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    'nuxt-stripe-module'
   ],
+  stripe: {
+    version: 'v3',
+    publishableKey: 'pk_test_yBVcFyDWFZeqbpVo6fKuLzUf',
+  },
   /*
   ** Axios module configuration
   */
@@ -61,10 +66,10 @@ module.exports = {
     ** You can extend webpack config here
     */
     transpile: [
-      '/plugins',
+      '/plugins/stripe',
     ],
     publicPath: '/public/',
-    vendor: ['isomorphic-fetch'],
+    vendor: [],
     extractCSS: true,
     bable: {
       presets: [

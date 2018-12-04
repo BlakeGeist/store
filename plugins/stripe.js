@@ -1,4 +1,11 @@
-import Vue from 'vue'
-import VueStripeCheckout from 'vue-stripe-checkout'
+import Vue from 'vue'; // eslint-disable-line import/no-extraneous-dependencies
+import VueStripeCheckout from 'vue-stripe-checkout';
 
-Vue.use(VueStripeCheckout, 'pk_test_yBVcFyDWFZeqbpVo6fKuLzUf')
+const { STRIPE_TOKEN } = process.env;
+const options = {
+  key: STRIPE_TOKEN,
+  locale: 'auto',
+  currency: 'USD',
+};
+
+if (STRIPE_TOKEN) Vue.use(VueStripeCheckout, options);

@@ -65,19 +65,6 @@
       </div>
     </div>
     <div v-if="this.$route.query.editPage" class="update-product"><button @click="updateProduct(product)">Update</button></div>
-    <vue-stripe-checkout
-        ref="checkoutRef"
-        :image="image"
-        :name="name"
-        :description="description"
-        :currency="currency"
-        :amount="parseInt(amount)"
-        :allow-remember-me="false"
-        @done="done"
-        @opened="opened"
-        @closed="closed"
-      >
-    </vue-stripe-checkout>
     <div class="footer">
       <router-link to="/privacy-policy" target="_blank">Privacy</router-link> |
       <router-link to="/terms" target="_blank">Terms</router-link>
@@ -195,6 +182,10 @@ export default {
       this.$refs.textarea.style.minHeight = this.$refs.textarea.scrollHeight + 'px'
       this.$refs.textarea2.style.minHeight = this.$refs.textarea2.scrollHeight + 'px'
     }
+    const elements = this.$stripe.import().elements();
+    const card = elements.create('card');
+    // Add an instance of the card Element into the `card-element` <div>
+    card.mount('.product-price');
   }
 }
 </script>

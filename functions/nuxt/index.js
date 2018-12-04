@@ -12,10 +12,10 @@ import { createStore } from './store.js'
 
 /* Plugins */
 
+import nuxt_plugin_templatespluginf468cd6e_88a607d4 from 'nuxt_plugin_templatespluginf468cd6e_88a607d4' // Source: ./templates.plugin.f468cd6e.js (ssr: false)
 import nuxt_plugin_axios_738a08a6 from 'nuxt_plugin_axios_738a08a6' // Source: ./axios.js
-import nuxt_plugin_fireauth_5cf9e358 from 'nuxt_plugin_fireauth_5cf9e358' // Source: ../../plugins/fireauth
-import nuxt_plugin_textArea_91871e60 from 'nuxt_plugin_textArea_91871e60' // Source: ../../plugins/textArea
 import nuxt_plugin_stripe_3a68e97a from 'nuxt_plugin_stripe_3a68e97a' // Source: ../../plugins/stripe (ssr: false)
+import nuxt_plugin_fireauth_5cf9e358 from 'nuxt_plugin_fireauth_5cf9e358' // Source: ../../plugins/fireauth
 
 // Component: <no-ssr>
 Vue.component(NoSSR.name, NoSSR)
@@ -156,9 +156,9 @@ async function createApp(ssrContext) {
 
   if (typeof nuxt_plugin_axios_738a08a6 === 'function') await nuxt_plugin_axios_738a08a6(app.context, inject)
   if (typeof nuxt_plugin_fireauth_5cf9e358 === 'function') await nuxt_plugin_fireauth_5cf9e358(app.context, inject)
-  if (typeof nuxt_plugin_textArea_91871e60 === 'function') await nuxt_plugin_textArea_91871e60(app.context, inject)
 
   if (process.client) {
+    if (typeof nuxt_plugin_templatespluginf468cd6e_88a607d4 === 'function') await nuxt_plugin_templatespluginf468cd6e_88a607d4(app.context, inject)
     if (typeof nuxt_plugin_stripe_3a68e97a === 'function') await nuxt_plugin_stripe_3a68e97a(app.context, inject)
   }
 
